@@ -1,0 +1,57 @@
+#include <stdio.h>
+struct Process {
+    int pid;     
+    int at;       
+    int bt;      
+    int priority;  
+    int wt;        
+    int tat;        
+    int completed;  
+};
+int main() {
+    int n, i, time = 0, completed_processes = 0;
+     printf("Enter number of processes: ");
+    scanf("%d", &n);
+    struct Process p[n];
+    for (i = 0; i < n; i++) {
+        p[i].pid = i + 1;
+        printf("Enter arrival time for Process %d: ", p[i].pid);
+        scanf("%d", &p[i].at);
+        printf("Enter burst time for Process %d: ", p[i].pid);
+        scanf("%d", &p[i].bt);
+        printf("Enter priority for Process %d (lower number = higher priority): ", p[i].pid);
+        scanf("%d", &p[i].priority);
+        p[i].completed = 0;
+    }
+    while (completed_processes < n) {
+        int idx = -1;
+        int highest_priority = 100000; 
+        for (i = 0; i < n; i++) {
+            if (p[i].at <= time && !p[i].completed && p[i].priority < highest_priority) {
+                highest_priority = p[i].priority;
+                idx = i;
+            }
+        }
+
+        if (idx != -1) {
+            // Execute the process
+            p[idx].wt = time - p[idx].at;
+            time += p[idx].bt;
+            p[idx].tat = p[idx].wt + p[idx].bt;
+            p[idx].completed = 1;
+            completed_processes++;
+        } else {
+            time++; // If no process has arrived, increment time
+        }
+    }
+    printf("\nProcess\tArrival\tBurst\tPriority\tWaiting\tTurnaround\n");
+    float avg_wt = 0, avg_tat = 0;
+    for (i = 0; i < n; i++) {
+        printf("P%d\t%d\t%d\t%d\t\t%d\t%d\n", p[i].pid, p[i].at, p[i].bt, p[i].priority, p[i].wt, p[i].tat);
+        avg_wt += p[i].wt;
+        avg_tat += p[i].tat;
+    }
+    printf("\nAverage Waiting Time: %.2f", avg_wt / n);
+    printf("\nAverage Turnaround Time: %.2f\n", avg_tat / n);
+   return 0;
+}
