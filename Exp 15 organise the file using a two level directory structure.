@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX_DIRS 10
+#define MAX_FILES 20
+#define NAME_LEN 20
+struct File { char name[NAME_LEN]; int size; };
+struct Dir { char name[NAME_LEN]; struct File f[MAX_FILES]; int fcount; } dirs[MAX_DIRS];
+int dcount = 0;
+void createDir() {
+    if(dcount >= MAX_DIRS) { printf("Max subdirs reached\n"); return; }
+    char n[NAME_LEN]; printf("Subdir name: "); scanf("%s", n);
+    for(int i=0;i<dcount;i++) if(strcmp(dirs[i].name,n)==0){printf("Exists\n");return;}
+    strcpy(dirs[dcount].name,n); dirs[dcount].fcount=0; dcount++; printf("Created\n");
+}
+void createFile() {
+    if(dcount==0){printf("No subdirs\n"); return;}
+    char dn[NAME_LEN], fn[NAME_LEN]; int sz; printf("Subdir: "); scanf("%s", dn);
+    int idx=-1; for(int i=0;i<dcount;i++) if(strcmp(dirs[i].name,dn)==0){idx=i;break;}
+    if(idx==-1){printf("Not found\n"); return;}
+    printf("File name & size: "); scanf("%s %d", fn,&sz);
+    strcpy(dirs[idx].f[dirs[idx].fcount].name,fn); dirs[idx].f[dirs[idx].fcount].size=sz; dirs[idx].fcount++;
+    printf("File created\n");
+}
+void display() {
+    for(int i=0;i<dcount;i++){
+        printf("Subdir: %s\n", dirs[i].name);
+        for(int j=0;j<dirs[i].fcount;j++) printf("\t%s (%d KB)\n", dirs[i].f[j].name, dirs[i].f[j].size);
+    }
+}
+int main() {
+    int ch;
+    while(1){
+        printf("\n1.Create Subdir 2.Create File 3.Display 4.Exit\nChoice: "); scanf("%d",&ch);
+        if(ch==1) createDir();
+        else if(ch==2) createFile();
+        else if(ch==3) display();
+        else break;
+        }
+    return 0;
+}
