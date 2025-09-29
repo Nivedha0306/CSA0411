@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <stdlib.h>
+struct Employee {
+    int id;
+    char name[30];
+    float salary;
+};
+int main() {
+    FILE *file;
+    struct Employee emp;
+    int choice, empID;
+
+    file = fopen("employees.dat", "rb+");
+    if (file == NULL) {
+        file = fopen("employees.dat", "wb+");
+        if (file == NULL) {
+            printf("Error opening file!\n");
+            exit(1);
+        }
+    }
+   while (1) {
+        printf("\n--- Employee Random Access File ---\n");
+        printf("1. Add/Update Employee\n");
+        printf("2. Display Employee by ID\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter Employee ID (record number): ");
+                scanf("%d", &emp.id);
+                printf("Enter Name: ");
+                getchar();  // Clear newline
+                fgets(emp.name, sizeof(emp.name), stdin);
+                printf("Enter Salary: ");
+                scanf("%f", &emp.salary);
+
+                fseek(file, (emp.id - 1) * sizeof(struct Employee), SEEK_SET);
+                fwrite(&emp, sizeof(struct Employee), 1, file);
+                printf("Record saved/updated.\n");
+                break;
+
+            case 2:
+                printf("Enter Employee ID (record number): ");
+                scanf("%d", &empID);
+
+                fseek(file, (empID - 1) * sizeof(struct Employee), SEEK_SET);
+                if (fread(&emp, sizeof(struct Employee), 1, file) == 1) {
+                    printf("\nEmployee Details:\n");
+                    printf("ID: %d\n", emp.id);
+                    printf("Name: %s", emp.name);
+                    printf("Salary: %.2f\n", emp.salary);
+                } else {
+                    printf("No record found at that ID.\n");
+                }
+                break;
+
+            case 3:
+                fclose(file);
+                printf("Exiting program.\n");
+                exit(0);
+
+            default:
+                printf("Invalid choice. Try again.\n");
+        }
+    }
+
+    return 0;
+}
