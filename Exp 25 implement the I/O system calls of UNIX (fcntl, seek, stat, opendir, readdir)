@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <string.h>
+#include <errno.h>
+int main() {
+    int fd;
+    struct stat fileStat;
+    DIR *dir;
+    struct dirent *entry;
+    fd = open("sample.txt", O_RDWR | O_CREAT, 0644);
+    if (fd < 0) {
+        perror("Error opening file");
+        return 1;
+    }
+    printf("File 'sample.txt' opened with file descriptor %d\n", fd);
+  int flags = fcntl(fd, F_GETFL);
+    if (flags < 0) {
+        perror("fcntl F_GETFL failed");
+        close(fd);
+        return 1;
+    }
+    printf("File access mode (flags): %d\n", flags);
+    if (write(fd, "Hello, UNIX I/O!", 16) < 0) {
+        perror("Write failed");
+        close(fd);
+        return 1;
+    }
+    off_t pos = lseek(fd, 0, SEEK_SET);
+    if (pos < 0) {
+        perror("lseek failed");
+        close(fd);
+        return 1;
+    }
+    printf("File offset reset to: %ld\n", (long)pos);
+    if (stat("sample.txt", &fileStat) < 0) {
+        perror("stat error");
+        close(fd);
+        return 1;
+    }
+    printf("\nFile Information (stat):\n");
+    printf("Size: %ld bytes\n", fileStat.st_size);
+    printf("Inode: %lu\n", fileStat.st_ino);
+    printf("Permissions: %o\n", fileStat.st_mode & 0777);
+
+    close(fd);
+    printf("\nDirectory Listing (current directory):\n");
+    dir = opendir(".");
+    if (dir == NULL) {
+        perror("opendir failed");
+        return 1;
+    }
+    while ((entry = readdir(dir)) != NULL) {
+        printf("%s\n", entry->d_name);
+    }
+    closedir(dir);
+
+    return 0;
+}
