@@ -1,0 +1,30 @@
+#include <stdio.h>
+#include <sys/stat.h>
+void print_permissions(mode_t mode) {
+    printf("File permissions: ");
+    printf( (S_ISDIR(mode)) ? "d" : "-");
+    printf( (mode & S_IRUSR) ? "r" : "-");
+    printf( (mode & S_IWUSR) ? "w" : "-");
+    printf( (mode & S_IXUSR) ? "x" : "-");
+    printf( (mode & S_IRGRP) ? "r" : "-");
+    printf( (mode & S_IWGRP) ? "w" : "-");
+    printf( (mode & S_IXGRP) ? "x" : "-");
+    printf( (mode & S_IROTH) ? "r" : "-");
+    printf( (mode & S_IWOTH) ? "w" : "-");
+    printf( (mode & S_IXOTH) ? "x" : "-");
+    printf("\n");
+}
+int main() {
+    const char *filename = "testfile.txt";  
+    struct stat fileStat;
+   if(stat(filename, &fileStat) < 0) {
+        perror("stat");
+        return 1;
+    }
+    printf("Information for %s\n", filename);
+    printf("Owner UID: %d\n", fileStat.st_uid);
+    printf("Group GID: %d\n", fileStat.st_gid);
+    print_permissions(fileStat.st_mode);
+
+    return 0;
+}
