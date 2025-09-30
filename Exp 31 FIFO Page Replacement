@@ -1,0 +1,54 @@
+#include <stdio.h>
+int main() {
+    int pages[50], frame[10], pageFaults = 0, pageHits = 0;
+    int n, f, i, j, k = 0, flag;
+    printf("Enter the number of pages: ");
+    scanf("%d", &n);
+    printf("Enter the page reference string:\n");
+    for(i = 0; i < n; i++) {
+        scanf("%d", &pages[i]);
+    }
+    printf("Enter the number of frames: ");
+    scanf("%d", &f);
+    for(i = 0; i < f; i++) {
+        frame[i] = -1;
+    }
+     printf("\nPage Reference String: ");
+    for(i = 0; i < n; i++) {
+        printf("%d ", pages[i]);
+    }
+     printf("\n\nFIFO Page Replacement Process:\n");
+      for(i = 0; i < n; i++) {
+        flag = 0;
+        for(j = 0; j < f; j++) {
+            if(frame[j] == pages[i]) {
+                flag = 1;
+                pageHits++;
+                break;
+            }
+        }
+
+        // If page not found (page fault)
+        if(flag == 0) {
+            frame[k] = pages[i];
+            k = (k + 1) % f; 
+            pageFaults++;
+        }
+        printf("After page %d: ", pages[i]);
+        for(j = 0; j < f; j++) {
+            if(frame[j] == -1)
+                printf("- ");
+            else
+                printf("%d ", frame[j]);
+        }
+
+        if(flag == 0)
+            printf("  (Fault)\n");
+        else
+            printf("  (Hit)\n");
+    }
+    printf("\nTotal Page Faults: %d\n", pageFaults);
+    printf("Total Page Hits: %d\n", pageHits);
+
+    return 0;
+}
