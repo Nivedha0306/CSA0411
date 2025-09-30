@@ -1,0 +1,37 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <unistd.h>
+void* thread_function(void* arg) {
+    pthread_t current_thread = pthread_self();
+    pthread_t* main_thread = (pthread_t*)arg;
+    if (pthread_equal(current_thread, *main_thread)) {
+        printf("Child thread: This thread is equal to the main thread (unexpected).\n");
+    } else {
+        printf("Child thread: This thread is NOT equal to the main thread.\n");
+    }
+      printf("Child thread: Exiting using pthread_exit.\n");
+    pthread_exit(NULL);  // (iv) exit
+}
+int main() {
+    pthread_t thread_id;
+    pthread_t main_thread_id = pthread_self();  
+    printf("Main thread: Creating a new thread.\n");
+    if (pthread_create(&thread_id, NULL, thread_function, &main_thread_id) != 0) {
+        perror("Failed to create thread");
+        exit(1);
+    }
+    if (pthread_join(thread_id, NULL) != 0) {
+        perror("Failed to join thread");
+        exit(1);
+    }
+    printf("Main thread: Joined the child thread successfully.\n");
+    if (pthread_equal(main_thread_id, pthread_self())) {
+        printf("Main thread: pthread_equal confirms this is still the main thread.\n");
+    } else {
+        printf("Main thread: pthread_equal failed.\n");
+    }
+
+    printf("Main thread: Exiting normally.\n");
+    return 0;
+}
