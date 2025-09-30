@@ -1,0 +1,57 @@
+#include <stdio.h>
+#include <stdlib.h>
+int main() {
+    int n, head, i, j, temp;
+    int total_movement = 0;
+    int disk_size;
+    printf("Enter the number of disk requests: ");
+    scanf("%d", &n);
+    int requests[n];
+    printf("Enter the disk requests: ");
+    for(i = 0; i < n; i++) {
+        scanf("%d", &requests[i]);
+    }
+    printf("Enter initial head position: ");
+    scanf("%d", &head);
+    printf("Enter the disk size: ");
+    scanf("%d", &disk_size);
+    for(i = 0; i < n - 1; i++) {
+        for(j = i + 1; j < n; j++) {
+            if(requests[i] > requests[j]) {
+                temp = requests[i];
+                requests[i] = requests[j];
+                requests[j] = temp;
+            }
+        }
+    }
+
+    int index;
+    // Find the first request greater than head
+    for(i = 0; i < n; i++) {
+        if(requests[i] > head) {
+            index = i;
+            break;
+        }
+    }
+
+    printf("\nC-SCAN Disk Scheduling Sequence:\n");
+    for(i = index; i < n; i++) {
+        printf("%d ", requests[i]);
+        total_movement += abs(requests[i] - head);
+        head = requests[i];
+}
+    if(head != disk_size - 1) {
+        total_movement += abs((disk_size - 1) - head); // move to end
+        head = 0; // jump to start
+        total_movement += abs(disk_size - 1); // count jump to start
+    }
+    for(i = 0; i < index; i++) {
+        printf("%d ", requests[i]);
+        total_movement += abs(requests[i] - head);
+        head = requests[i];
+    }
+
+    printf("\nTotal head movement: %d\n", total_movement);
+
+    return 0;
+}
