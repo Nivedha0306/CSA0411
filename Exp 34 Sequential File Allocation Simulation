@@ -1,0 +1,117 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX_BLOCKS 100    
+#define MAX_FILES 10      
+typedef struct {
+    char name[20];
+    int start;
+    int size;  
+} File;
+int disk[MAX_BLOCKS];  // 0 = free, 1 = occupied
+File files[MAX_FILES];
+int fileCount = 0;
+void createFile() {
+    char fname[20];
+    int fsize;
+    printf("\nEnter file name: ");
+    scanf("%s", fname);
+    printf("Enter number of records (blocks needed): ");
+    scanf("%d", &fsize);
+    int start = -1, count = 0;
+    for(int i = 0; i < MAX_BLOCKS; i++) {
+        if(disk[i] == 0) {
+            count++;
+            if(count == fsize) {
+                start = i - fsize + 1;
+                break;
+            }
+        } else {
+            count = 0;
+        }
+    }
+
+    if(start == -1) {
+        printf("Not enough contiguous space for file %s\n", fname);
+        return;
+    }
+    for(int i = start; i < start + fsize; i++) {
+        disk[i] = 1;
+    }
+    strcpy(files[fileCount].name, fname);
+    files[fileCount].start = start;
+    files[fileCount].size = fsize;
+    fileCount++;
+
+    printf("File %s created from block %d to %d\n", fname, start, start + fsize - 1);
+}
+void accessRecord() {
+    char fname[20];
+    int recNo;
+    printf("\nEnter file name: ");
+    scanf("%s", fname);
+    printf("Enter record number to access (starting from 1): ");
+    scanf("%d", &recNo);
+    for(int i = 0; i < fileCount; i++) {
+        if(strcmp(files[i].name, fname) == 0) {
+            if(recNo > 0 && recNo <= files[i].size) {
+                printf("Accessing record %d of file %s...\n", recNo, fname);
+                printf("Reading records 1 to %d sequentially.\n", recNo);
+                return;
+            } else {
+                printf("Invalid record number.\n");
+                return;
+            }
+        }
+    }
+    printf("File not found.\n");
+}
+void displayFiles() {
+    if(fileCount == 0) {
+        printf("\nNo files created yet.\n");
+        return;
+    }
+
+    printf("\nFile Allocation Table (Sequential Allocation):\n");
+    printf("--------------------------------------------------\n");
+    printf("Name\tStart\tEnd\tSize\n");
+    for(int i = 0; i < fileCount; i++) {
+        printf("%s\t%d\t%d\t%d\n",
+               files[i].name,
+               files[i].start,
+               files[i].start + files[i].size - 1,
+               files[i].size);
+    }
+}
+int main() {
+    // Initialize disk as free
+    for(int i = 0; i < MAX_BLOCKS; i++) {
+        disk[i] = 0;
+    }
+
+    int choice;
+    while(1) {
+        printf("\n===== SEQUENTIAL FILE ALLOCATION MENU =====\n");
+        printf("1. Create File\n");
+        printf("2. Access Record\n");
+        printf("3. Display Allocation\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch(choice) {
+            case 1:
+                createFile();
+                break;
+            case 2:
+                accessRecord();
+                break;
+            case 3:
+                displayFiles();
+                break;
+            case 4:
+                return 0;
+            default:
+                printf("Invalid choice.\n");
+        }
+    }
+}
