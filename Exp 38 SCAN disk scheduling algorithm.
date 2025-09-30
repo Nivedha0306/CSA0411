@@ -1,0 +1,77 @@
+#include <stdio.h>
+#include <stdlib.h>
+void sort(int arr[], int n) {
+    int i, j, temp;
+    for (i = 0; i < n-1; i++) {
+        for (j = 0; j < n-i-1; j++) {
+            if (arr[j] > arr[j+1]) {
+                temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+}
+
+int main() {
+    int n, head, i, j, totalSeek = 0, direction;
+     printf("Enter number of disk requests: ");
+    scanf("%d", &n);
+    int requests[n];
+    printf("Enter the disk requests (0 - 199):\n");
+    for (i = 0; i < n; i++) {
+        scanf("%d", &requests[i]);
+    }
+
+    printf("Enter initial head position: ");
+    scanf("%d", &head);
+    printf("Enter direction (0 for left, 1 for right): ");
+    scanf("%d", &direction);
+    sort(requests, n);  
+    int seekSequence[n + 2]; 
+    int index = 0;
+    for (i = 0; i < n; i++) {
+        if (requests[i] > head) {
+            break;
+        }
+    }
+
+    if (direction == 1) { // Moving towards right
+        for (j = i; j < n; j++) {
+            seekSequence[index++] = requests[j];
+            totalSeek += abs(head - requests[j]);
+            head = requests[j];
+        }
+        if (head != 199) {
+            totalSeek += abs(head - 199);
+            head = 199;
+        }
+        for (j = i-1; j >= 0; j--) {
+            seekSequence[index++] = requests[j];
+            totalSeek += abs(head - requests[j]);
+            head = requests[j];
+        }
+    } else {
+        for (j = i-1; j >= 0; j--) {
+            seekSequence[index++] = requests[j];
+            totalSeek += abs(head - requests[j]);
+            head = requests[j];
+        }
+        if (head != 0) {
+            totalSeek += abs(head - 0);
+            head = 0;
+        }
+        for (j = i; j < n; j++) {
+            seekSequence[index++] = requests[j];
+            totalSeek += abs(head - requests[j]);
+            head = requests[j];
+        }
+    }
+    printf("\nSeek Sequence: ");
+    for (i = 0; i < index; i++) {
+        printf("%d ", seekSequence[i]);
+    }
+    printf("\nTotal Seek Time: %d\n", totalSeek);
+
+    return 0;
+}
